@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Goal Tracker Pro</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a6fa5;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --gray: #6c757d;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background-color: #f5f7fa;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .card {
+      background-color: white;
+      margin-bottom: 25px;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .card h3 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 1.4rem;
+    }
+    
+    .form-group {
+      margin-bottom: 18px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    input, select, textarea, button {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      width: 100%;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    button.btn-success {
+      background-color: var(--success);
+    }
+    
+    button.btn-danger {
+      background-color: var(--danger);
+    }
+    
+    button.btn-warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    button.btn-info {
+      background-color: var(--info);
+    }
+    
+    button.btn-light {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background-color: var(--primary);
+      color: white;
+      position: sticky;
+      top: 0;
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background-color: #f8fafc;
+    }
+    
+    .status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.85rem;
+      display: inline-block;
+    }
+    
+    .status-good {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .progress-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .progress-bar {
+      flex-grow: 1;
+      height: 20px;
+      background-color: #e9ecef;
+      border-radius: 10px;
+      margin-right: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: var(--success);
+      transition: width 0.6s ease;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-buttons button {
+      padding: 8px 12px;
+      font-size: 14px;
+      width: auto;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .tab:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .tab.active {
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+      color: var(--primary);
+      background-color: #f8f9fa;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    #chartContainer {
+      margin-top: 40px;
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background-color: var(--success);
+      color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: none;
+      max-width: 400px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .reminder-alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 25px;
+      background-color: var(--warning);
+      color: var(--dark);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: none;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .reminder-alert button {
+      background-color: transparent;
+      color: var(--dark);
+      border: none;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      padding: 0;
+      width: auto;
+    }
+    
+    .filter-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-controls select, .filter-controls input {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .badge-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .badge-success {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .badge-warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    .badge-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .badge-info {
+      background-color: var(--info);
+      color: white;
+    }
+    
+    .badge-light {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    
+    .editable {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .editable:hover {
+      background-color: #f0f7ff;
+    }
+    
+    .journal-entry {
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .journal-entry-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .journal-entry-content {
+      white-space: pre-wrap;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #ddd;
+    }
+    
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .filter-controls {
+        flex-direction: column;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      th, td {
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2><i class="fas fa-bullseye"></i> Smart Goal Tracker Pro</h2>
+    
+    <div class="notification" id="notification"></div>
+    <div class="reminder-alert" id="reminderAlert">
+      <button onclick="dismissReminder()"><i class="fas fa-times"></i></button>
+      <div id="reminderContent"></div>
+    </div>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+      <div class="tab" onclick="switchTab('goals')"><i class="fas fa-bullseye"></i> Goals</div>
+      <div class="tab" onclick="switchTab('progress')"><i class="fas fa-chart-line"></i> Progress</div>
+      <div class="tab" onclick="switchTab('reminders')"><i class="fas fa-bell"></i> Reminders</div>
+      <div class="tab" onclick="switchTab('journal')"><i class="fas fa-book"></i> Journal</div>
+      <div class="tab" onclick="switchTab('analytics')"><i class="fas fa-chart-pie"></i> Analytics</div>
+    </div>
+    
+    <div id="dashboard" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-tachometer-alt"></i> Quick Overview</h3>
+        </div>
+        <div id="dashboardStats" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+          <!-- Stats will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-calendar-check"></i> Today's Priorities</h3>
+        </div>
+        <div id="todaysPriorities">
+          <!-- Today's priorities will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-bell"></i> Upcoming Reminders</h3>
+        </div>
+        <div id="upcomingReminders">
+          <!-- Upcoming reminders will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+    
+    <div id="goals" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-plus-circle"></i> Add New Goal</h3>
+        </div>
+        <form id="goalForm">
+          <div class="form-group">
+            <label for="goalName">Goal Name</label>
+            <input type="text" id="goalName" placeholder="e.g., Walk 10,000 steps daily" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="goalType">Goal Type</label>
+            <select id="goalType" onchange="toggleFields()">
+              <option value="quantity">Quantity (Numbers)</option>
+              <option value="time">Time-Based</option>
+              <option value="boolean">Yes/No Habit</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="amountSection">
+            <label for="targetAmount">Target Amount</label>
+            <input type="number" id="targetAmount" placeholder="e.g., 10000">
+          </div>
+          
+          <div class="form-group">
+            <label for="unit">Measurement Unit</label>
+            <select id="unit">
+              <option value="steps">Steps</option>
+              <option value="minutes">Minutes</option>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="times">Times</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="goalCategory">Goal Category</label>
+            <select id="goalCategory">
+              <option value="health">Health</option>
+              <option value="fitness">Fitness</option>
+              <option value="career">Career</option>
+              <option value="learning">Learning</option>
+              <option value="personal">Personal</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="goalFrequency">Frequency</label>
+            <select id="goalFrequency">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="yearly">Yearly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="targetNature">Target Type</label>
+            <select id="targetNature">
+              <option value="atleast">Minimum (At Least)</option>
+              <option value="atmost">Maximum (At Most)</option>
+              <option value="exact">Exact Target</option>
+            </select>
+          </div>
+          
+          <div class="form-row" style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="startDate">Start Date</label>
+              <input type="date" id="startDate">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="endDate">End Date</label>
+              <input type="date" id="endDate">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="goalNotes">Notes (Optional)</label>
+            <textarea id="goalNotes" rows="3" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn-success"><i class="fas fa-plus"></i> Add Goal</button>
+        </form>
+      </div>
+    </div>
+    
+    <div id="progress" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-chart-line"></i> Track Progress</h3>
+        </div>
+        <form id="progressForm">
+          <div class="form-group">
+            <label for="progressGoal">Select Goal</label>
+            <select id="progressGoal" required onchange="toggleProgressFields()">
+              <option value="">-- Select a Goal --</option>
+            </select>
+          </div>
+          
+          <div id="progressAmountSection" class="form-group">
+            <label for="progressAmount">Amount Completed</label>
+            <input type="number" id="progressAmount" placeholder="e.g., 5000">
+          </div>
+          
+          <div id="progressTimeSection" class="form-group" style="display:none">
+            <label for="progressTime">Time Spent (HH:MM)</label>
+            <input type="time" id="progressTime">
+          </div>
+          
+          <div id="progressYesNoSection" class="form-group" style="display:none">
+            <label for="progressYesNo">Did you complete it today?</label>
+            <select id="progressYesNo">
+              <option value="yes">Yes, I did it!</option>
+              <option value="no">No, I didn't</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="progressDate">Date</label>
+            <input type="date" id="progressDate" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="progressNotes">Notes (Optional)</label>
+            <textarea id="progressNotes" rows="3" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn-success"><i class="fas fa-save"></i> Save Progress</button>
+        </form>
+      </div>
+    </div>
+    
+    <div id="reminders" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-bell"></i> Add New Reminder</h3>
+        </div>
+        <form id="reminderForm">
+          <div class="form-group">
+            <label for="reminderTitle">Reminder Title</label>
+            <input type="text" id="reminderTitle" placeholder="e.g., Take medication" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="reminderDescription">Description (Optional)</label>
+            <textarea id="reminderDescription" rows="2" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;"></textarea>
+          </div>
+          
+          <div class="form-row" style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="reminderDate">Date</label>
+              <input type="date" id="reminderDate" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="reminderTime">Time</label>
+              <input type="time" id="reminderTime" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="reminderRepeat">Repeat</label>
+            <select id="reminderRepeat">
+              <option value="none">Does not repeat</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="reminderPriority">Priority</label>
+            <select id="reminderPriority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-success"><i class="fas fa-plus"></i> Add Reminder</button>
+        </form>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-list"></i> Your Reminders</h3>
+        </div>
+        <div class="filter-controls">
+          <select id="reminderFilter" onchange="filterReminders()">
+            <option value="all">All Reminders</option>
+            <option value="today">Today</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+            <option value="recurring">Recurring</option>
+          </select>
+          <select id="reminderPriorityFilter" onchange="filterReminders()">
+            <option value="all">All Priorities</option>
+            <option value="high">High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
+        <table id="remindersTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Date/Time</th>
+              <th>Repeat</th>
+              <th>Priority</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div id="journal" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-pen"></i> New Journal Entry</h3>
+        </div>
+        <form id="journalForm">
+          <div class="form-group">
+            <label for="journalTitle">Title (Optional)</label>
+            <input type="text" id="journalTitle" placeholder="e.g., Today's reflections">
+          </div>
+          
+          <div class="form-group">
+            <label for="journalContent">Your Thoughts</label>
+            <textarea id="journalContent" rows="8" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="journalTags">Tags (comma separated, optional)</label>
+            <input type="text" id="journalTags" placeholder="e.g., reflection, ideas, goals">
+          </div>
+          
+          <div class="form-group">
+            <label for="journalMood">Mood</label>
+            <select id="journalMood">
+              <option value="">-- Select Mood --</option>
+              <option value="happy">😊 Happy</option>
+              <option value="sad">😢 Sad</option>
+              <option value="excited">😃 Excited</option>
+              <option value="angry">😠 Angry</option>
+              <option value="neutral">😐 Neutral</option>
+              <option value="tired">😴 Tired</option>
+              <option value="productive">💪 Productive</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-success"><i class="fas fa-save"></i> Save Entry</button>
+        </form>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-book-open"></i> Journal Entries</h3>
+        </div>
+        <div class="filter-controls">
+          <select id="journalDateFilter" onchange="filterJournalEntries()">
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
+          <select id="journalMoodFilter" onchange="filterJournalEntries()">
+            <option value="all">All Moods</option>
+            <option value="happy">Happy</option>
+            <option value="sad">Sad</option>
+            <option value="excited">Excited</option>
+            <option value="angry">Angry</option>
+            <option value="neutral">Neutral</option>
+            <option value="tired">Tired</option>
+            <option value="productive">Productive</option>
+          </select>
+          <input type="text" id="journalSearch" placeholder="Search entries..." oninput="filterJournalEntries()">
+        </div>
+        <div id="journalEntries">
+          <!-- Journal entries will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+    
+    <div id="analytics" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-chart-pie"></i> Goal Progress Analytics</h3>
+        </div>
+        <div id="chartContainer">
+          <canvas id="progressChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-table"></i> Goal Summary</h3>
+        </div>
+        <div class="filter-controls">
+          <select id="goalFilter" onchange="filterGoals()">
+            <option value="all">All Goals</option>
+            <option value="active">Active Goals</option>
+            <option value="completed">Completed Goals</option>
+            <option value="behind">Behind Schedule</option>
+            <option value="ontrack">On Track</option>
+          </select>
+          <select id="goalTypeFilter" onchange="filterGoals()">
+            <option value="all">All Types</option>
+            <option value="quantity">Quantity</option>
+            <option value="time">Time-Based</option>
+            <option value="boolean">Yes/No</option>
+          </select>
+          <select id="goalCategoryFilter" onchange="filterGoals()">
+            <option value="all">All Categories</option>
+            <option value="health">Health</option>
+            <option value="fitness">Fitness</option>
+            <option value="career">Career</option>
+            <option value="learning">Learning</option>
+            <option value="personal">Personal</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" id="goalSearch" placeholder="Search goals..." oninput="filterGoals()">
+        </div>
+        <div class="table-responsive">
+          <table id="goalSummary">
+            <thead>
+              <tr>
+                <th onclick="sortGoals('name')">Goal <i class="fas fa-sort"></i></th>
+                <th onclick="sortGoals('progress')">Progress <i class="fas fa-sort"></i></th>
+                <th onclick="sortGoals('status')">Status <i class="fas fa-sort"></i></th>
+                <th onclick="sortGoals('frequency')">Frequency <i class="fas fa-sort"></i></th>
+                <th onclick="sortGoals('category')">Category <i class="fas fa-sort"></i></th>
+                <th>Current Speed</th>
+                <th>Required Speed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-cog"></i> Data Management</h3>
+        </div>
+        <div class="action-buttons" style="justify-content: center; margin-top: 20px;">
+          <button onclick="exportData()" class="btn-success"><i class="fas fa-file-export"></i> Export All Data</button>
+          <button onclick="document.getElementById('importFile').click()" class="btn-warning"><i class="fas fa-file-import"></i> Import Data</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+          <button onclick="addSampleData()" class="btn-info"><i class="fas fa-magic"></i> Add Sample Data</button>
+          <button onclick="clearAllData()" class="btn-danger"><i class="fas fa-trash"></i> Clear All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let goals = [];
+    let reminders = [];
+    let journalEntries = [];
+    let progressChart = null;
+    let currentSort = { column: 'name', direction: 'asc' };
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set default dates
+      document.getElementById('startDate').value = today;
+      document.getElementById('progressDate').value = today;
+      document.getElementById('reminderDate').value = today;
+      
+      // Load saved data
+      loadData();
+      
+      // Check for active reminders
+      checkReminders();
+      
+      // Set up form event listeners
+      document.getElementById('goalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addGoal();
+      });
+
+      document.getElementById('progressForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addProgress();
+      });
+      
+      document.getElementById('reminderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addReminder();
+      });
+      
+      document.getElementById('journalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addJournalEntry();
+      });
+      
+      // Initialize UI
+      updateGoalSelect();
+      updateGoalList();
+      updateRemindersList();
+      updateJournalEntries();
+      updateDashboard();
+      drawChart();
+      
+      // Check for reminders every minute
+      setInterval(checkReminders, 60000);
+    });
+
+    // Tab switching
+    function switchTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Deactivate all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Activate selected tab
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+      
+      // Update content when switching tabs
+      if (tabId === 'analytics') {
+        drawChart();
+      } else if (tabId === 'dashboard') {
+        updateDashboard();
+      } else if (tabId === 'reminders') {
+        updateRemindersList();
+      } else if (tabId === 'journal') {
+        updateJournalEntries();
+      }
+    }
+
+    // Form field toggling
+    function toggleFields() {
+      const goalType = document.getElementById('goalType').value;
+      const amountSection = document.getElementById('amountSection');
+      
+      if (goalType === 'boolean') {
+        amountSection.style.display = 'none';
+        document.getElementById('unit').value = '';
+      } else {
+        amountSection.style.display = 'block';
+      }
+    }
+
+    function toggleProgressFields() {
+      const selectedOption = document.querySelector('#progressGoal option:checked');
+      if (!selectedOption) return;
+      
+      const goalType = selectedOption.dataset.type;
+      document.getElementById('progressAmountSection').style.display = goalType === 'quantity' ? 'block' : 'none';
+      document.getElementById('progressTimeSection').style.display = goalType === 'time' ? 'block' : 'none';
+      document.getElementById('progressYesNoSection').style.display = goalType === 'boolean' ? 'block' : 'none';
+    }
+
+    // Notification system
+    function showNotification(message, type = 'success', duration = 3000) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.display = 'block';
+      notification.style.backgroundColor = type === 'success' ? 'var(--success)' : 
+                                         type === 'error' ? 'var(--danger)' : 
+                                         type === 'warning' ? 'var(--warning)' :
+                                         'var(--primary)';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, duration);
+    }
+
+    // Goal management
+    function addGoal() {
+      const goalName = document.getElementById('goalName').value.trim();
+      if (!goalName) {
+        showNotification('Please enter a goal name', 'error');
+        return;
+      }
+      
+      const goalType = document.getElementById('goalType').value;
+      const targetAmount = document.getElementById('targetAmount').value;
+      
+      if (goalType !== 'boolean' && !targetAmount) {
+        showNotification('Please enter a target amount', 'error');
+        return;
+      }
+      
+      const goal = {
+        id: Date.now().toString(),
+        name: goalName,
+        type: goalType,
+        target: goalType === 'boolean' ? 'yes' : targetAmount,
+        unit: document.getElementById('unit').value,
+        category: document.getElementById('goalCategory').value,
+        frequency: document.getElementById('goalFrequency').value,
+        startDate: document.getElementById('startDate').value || today,
+        endDate: document.getElementById('endDate').value || '',
+        targetNature: document.getElementById('targetNature').value,
+        notes: document.getElementById('goalNotes').value.trim(),
+        progress: [],
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      };
+      
+      goals.push(goal);
+      saveData();
+      updateGoalSelect();
+      updateGoalList();
+      drawChart();
+      document.getElementById('goalForm').reset();
+      
+      // Reset default dates
+      document.getElementById('startDate').value = today;
+      
+      showNotification('Goal added successfully!');
+    }
+
+    function addProgress() {
+      const goalId = document.getElementById('progressGoal').value;
+      if (!goalId) {
+        showNotification('Please select a goal', 'error');
+        return;
+      }
+      
+      const date = document.getElementById('progressDate').value;
+      if (!date) {
+        showNotification('Please select a date', 'error');
+        return;
+      }
+      
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) {
+        showNotification('Selected goal not found', 'error');
+        return;
+      }
+      
+      let value;
+      if (goal.type === 'time') {
+        value = document.getElementById('progressTime').value;
+        if (!value) {
+          showNotification('Please enter time spent', 'error');
+          return;
+        }
+      } else if (goal.type === 'boolean') {
+        value = document.getElementById('progressYesNo').value;
+      } else {
+        value = document.getElementById('progressAmount').value;
+        if (!value) {
+          showNotification('Please enter progress amount', 'error');
+          return;
+        }
+      }
+      
+      const notes = document.getElementById('progressNotes').value.trim();
+      
+      // Check if progress already exists for this date
+      const existingIndex = goal.progress.findIndex(p => p.date === date);
+      const progress = { 
+        date, 
+        value,
+        notes,
+        recordedAt: new Date().toISOString()
+      };
+      
+      if (existingIndex >= 0) {
+        // Update existing progress
+        goal.progress[existingIndex] = progress;
+        showNotification('Progress updated successfully!');
+      } else {
+        // Add new progress
+        goal.progress.push(progress);
+        showNotification('Progress recorded successfully!');
+      }
+      
+      goal.lastUpdated = new Date().toISOString();
+      saveData();
+      updateGoalList();
+      drawChart();
+      document.getElementById('progressForm').reset();
+      
+      // Reset date to today
+      document.getElementById('progressDate').value = today;
+    }
+
+    function updateGoalSelect() {
+      const select = document.getElementById('progressGoal');
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">-- Select a Goal --</option>';
+      
+      goals.forEach(goal => {
+        const option = document.createElement('option');
+        option.value = goal.id;
+        option.textContent = goal.name;
+        option.dataset.type = goal.type;
+        select.appendChild(option);
+      });
+      
+      // Restore selected value if possible
+      if (currentValue && goals.some(g => g.id === currentValue)) {
+        select.value = currentValue;
+      }
+      
+      toggleProgressFields();
+    }
+
+    function updateGoalList() {
+      const tbody = document.querySelector('#goalSummary tbody');
+      tbody.innerHTML = '';
+      
+      if (goals.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="8" style="text-align: center;">No goals yet. Add your first goal above!</td>';
+        tbody.appendChild(row);
+        return;
+      }
+      
+      // Apply filters
+      const filteredGoals = filterGoalsList();
+      
+      if (filteredGoals.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="8" style="text-align: center;">No goals match your filters</td>';
+        tbody.appendChild(row);
+        return;
+      }
+      
+      // Apply sorting
+      const sortedGoals = sortGoalsList(filteredGoals);
+      
+      sortedGoals.forEach(goal => {
+        const row = document.createElement('tr');
+        
+        // Calculate progress metrics
+        const progressData = calculateGoalProgress(goal);
+        
+        row.innerHTML = `
+          <td class="editable" onclick="editGoalCell('${goal.id}', 'name')">
+            <strong>${goal.name}</strong>
+            <div class="badge badge-${getCategoryColor(goal.category)}">${goal.category}</div>
+            ${goal.notes ? '<br><small>' + goal.notes + '</small>' : ''}
+          </td>
+          <td>
+            <div class="progress-container">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progressData.percentage}%"></div>
+              </div>
+              <span>${Math.round(progressData.percentage)}%</span>
+            </div>
+            <small>Achieved: ${progressData.achievedDisplay}</small>
+          </td>
+          <td><span class="${progressData.status}">${Math.round(progressData.percentage)}% ${progressData.status.replace('status-', '')}</span></td>
+          <td class="editable" onclick="editGoalCell('${goal.id}', 'frequency')">
+            ${formatFrequency(goal.frequency)}
+          </td>
+          <td class="editable" onclick="editGoalCell('${goal.id}', 'category')">
+            ${goal.category}
+          </td>
+          <td>${progressData.currentSpeed || '-'}</td>
+          <td>${progressData.requiredSpeed || '-'}</td>
+          <td class="action-buttons">
+            <button onclick="viewGoalDetails('${goal.id}')" class="btn-success" title="View Details"><i class="fas fa-eye"></i></button>
+            <button onclick="showEditGoalModal('${goal.id}')" class="btn-info" title="Edit"><i class="fas fa-edit"></i></button>
+            <button onclick="deleteGoal('${goal.id}')" class="btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    function calculateGoalProgress(goal) {
+      let achieved = 0;
+      let percentage = 0;
+      let status = 'status-good';
+      let achievedDisplay = '';
+      let currentSpeed = '-';
+      let requiredSpeed = '-';
+      
+      // Calculate based on goal type
+      if (goal.type === 'boolean') {
+        achieved = goal.progress.filter(p => p.value === 'yes').length;
+        percentage = goal.progress.length > 0 ? (achieved / goal.progress.length) * 100 : 0;
+        achievedDisplay = `${achieved}/${goal.progress.length} days`;
+      } else if (goal.type === 'time') {
+        // Convert time to minutes for calculation
+        achieved = goal.progress.reduce((sum, p) => {
+          const [hours, mins] = p.value.split(':').map(Number);
+          return sum + hours * 60 + mins;
+        }, 0);
+        
+        const [targetHours, targetMins] = goal.target.split(':').map(Number);
+        const targetInMinutes = targetHours * 60 + targetMins;
+        percentage = targetInMinutes > 0 ? Math.min((achieved / targetInMinutes) * 100, 100) : 0;
+        
+        // Format display
+        const hours = Math.floor(achieved / 60);
+        const mins = achieved % 60;
+        achievedDisplay = `${hours}h ${mins}m`;
+        
+        // Calculate speeds if there's an end date
+        if (goal.endDate) {
+          const daysPassed = daysBetween(goal.startDate, today);
+          const totalDays = daysBetween(goal.startDate, goal.endDate);
+          const daysRemaining = totalDays - daysPassed;
+          
+          if (daysPassed > 0) {
+            currentSpeed = `${Math.round(achieved / daysPassed)} min/day`;
+          }
+          
+          if (daysRemaining > 0) {
+            const remainingMins = targetInMinutes - achieved;
+            requiredSpeed = `${Math.round(remainingMins / daysRemaining)} min/day`;
+          }
+        }
+      } else {
+        achieved = goal.progress.reduce((sum, p) => sum + Number(p.value || 0), 0);
+        percentage = goal.target > 0 ? Math.min((achieved / goal.target) * 100, 100) : 0;
+        achievedDisplay = `${achieved} ${goal.unit}`;
+        
+        // Calculate speeds if there's an end date
+        if (goal.endDate) {
+          const daysPassed = daysBetween(goal.startDate, today);
+          const totalDays = daysBetween(goal.startDate, goal.endDate);
+          const daysRemaining = totalDays - daysPassed;
+          
+          if (daysPassed > 0) {
+            currentSpeed = `${Math.round(achieved / daysPassed)} ${goal.unit}/day`;
+          }
+          
+          if (daysRemaining > 0) {
+            const remaining = goal.target - achieved;
+            requiredSpeed = `${Math.round(remaining / daysRemaining)} ${goal.unit}/day`;
+          }
+        }
+      }
+      
+      // Determine status
+      if (percentage < 50) {
+        status = 'status-danger';
+      } else if (percentage < 80) {
+        status = 'status-warning';
+      }
+      
+      return {
+        achieved,
+        percentage,
+        status,
+        achievedDisplay,
+        currentSpeed,
+        requiredSpeed
+      };
+    }
+    
+    function daysBetween(startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diff = end - start;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+    
+    function formatFrequency(frequency) {
+      const map = {
+        'daily': 'Daily',
+        'weekly': 'Weekly',
+        'monthly': 'Monthly',
+        'quarterly': 'Quarterly',
+        'yearly': 'Yearly',
+        'custom': 'Custom'
+      };
+      return map[frequency] || frequency;
+    }
+    
+    function getCategoryColor(category) {
+      const map = {
+        'health': 'success',
+        'fitness': 'primary',
+        'career': 'info',
+        'learning': 'warning',
+        'personal': 'danger',
+        'other': 'light'
+      };
+      return map[category] || 'light';
+    }
+    
+    function editGoalCell(goalId, field) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      const cell = document.querySelector(`td[onclick="editGoalCell('${goalId}', '${field}')"]`);
+      if (!cell) return;
+      
+      // If already editing, ignore
+      if (cell.querySelector('input, select')) return;
+      
+      // Save original content
+      const originalContent = cell.innerHTML;
+      
+      // Create input based on field type
+      let input;
+      if (field === 'name') {
+        input = document.createElement('input');
+        input.type = 'text';
+        input.value = goal.name;
+      } else if (field === 'category') {
+        input = document.createElement('select');
+        ['health', 'fitness', 'career', 'learning', 'personal', 'other'].forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          if (cat === goal.category) option.selected = true;
+          input.appendChild(option);
+        });
+      } else if (field === 'frequency') {
+        input = document.createElement('select');
+        ['daily', 'weekly', 'monthly', 'quarterly', 'yearly', 'custom'].forEach(freq => {
+          const option = document.createElement('option');
+          option.value = freq;
+          option.textContent = formatFrequency(freq);
+          if (freq === goal.frequency) option.selected = true;
+          input.appendChild(option);
+        });
+      } else {
+        return;
+      }
+      
+      // Style the input
+      input.style.width = '100%';
+      input.style.padding = '8px';
+      input.style.border = '1px solid #ddd';
+      input.style.borderRadius = '4px';
+      
+      // Create save button
+      const saveButton = document.createElement('button');
+      saveButton.innerHTML = '<i class="fas fa-check"></i>';
+      saveButton.className = 'btn-success';
+      saveButton.style.marginLeft = '5px';
+      saveButton.style.padding = '8px';
+      
+      // Create cancel button
+      const cancelButton = document.createElement('button');
+      cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+      cancelButton.className = 'btn-danger';
+      cancelButton.style.marginLeft = '5px';
+      cancelButton.style.padding = '8px';
+      
+      // Clear cell and add elements
+      cell.innerHTML = '';
+      cell.appendChild(input);
+      cell.appendChild(saveButton);
+      cell.appendChild(cancelButton);
+      
+      // Focus the input
+      input.focus();
+      
+      // Save function
+      const save = () => {
+        const newValue = input.value.trim();
+        if (newValue && newValue !== goal[field]) {
+          goal[field] = newValue;
+          goal.lastUpdated = new Date().toISOString();
+          saveData();
+          updateGoalList();
+          showNotification(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
+        } else {
+          cell.innerHTML = originalContent;
+        }
+      };
+      
+      // Event listeners
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') save();
+      });
+      
+      saveButton.addEventListener('click', save);
+      
+      cancelButton.addEventListener('click', () => {
+        cell.innerHTML = originalContent;
+      });
+      
+      // Click outside to cancel
+      const cancelOnClickOutside = (e) => {
+        if (!cell.contains(e.target)) {
+          cell.innerHTML = originalContent;
+          document.removeEventListener('click', cancelOnClickOutside);
+        }
+      };
+      
+      setTimeout(() => {
+        document.addEventListener('click', cancelOnClickOutside);
+      }, 100);
+    }
+    
+    function showEditGoalModal(goalId) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      // Create modal HTML
+      const modalHtml = `
+        <div id="editGoalModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
+          <div style="background-color: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 style="margin: 0;">Edit Goal</h3>
+              <button onclick="closeModal('editGoalModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form id="editGoalForm">
+              <div class="form-group">
+                <label for="editGoalName">Goal Name</label>
+                <input type="text" id="editGoalName" value="${goal.name}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="editGoalType">Goal Type</label>
+                <select id="editGoalType" onchange="toggleEditFields()">
+                  <option value="quantity" ${goal.type === 'quantity' ? 'selected' : ''}>Quantity (Numbers)</option>
+                  <option value="time" ${goal.type === 'time' ? 'selected' : ''}>Time-Based</option>
+                  <option value="boolean" ${goal.type === 'boolean' ? 'selected' : ''}>Yes/No Habit</option>
+                </select>
+              </div>
+              
+              <div class="form-group" id="editAmountSection" style="${goal.type === 'boolean' ? 'display: none;' : ''}">
+                <label for="editTargetAmount">Target Amount</label>
+                <input type="number" id="editTargetAmount" value="${goal.type !== 'boolean' ? goal.target : ''}">
+              </div>
+              
+              <div class="form-group">
+                <label for="editUnit">Measurement Unit</label>
+                <select id="editUnit">
+                  <option value="steps" ${goal.unit === 'steps' ? 'selected' : ''}>Steps</option>
+                  <option value="minutes" ${goal.unit === 'minutes' ? 'selected' : ''}>Minutes</option>
+                  <option value="hours" ${goal.unit === 'hours' ? 'selected' : ''}>Hours</option>
+                  <option value="days" ${goal.unit === 'days' ? 'selected' : ''}>Days</option>
+                  <option value="times" ${goal.unit === 'times' ? 'selected' : ''}>Times</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="editGoalCategory">Goal Category</label>
+                <select id="editGoalCategory">
+                  <option value="health" ${goal.category === 'health' ? 'selected' : ''}>Health</option>
+                  <option value="fitness" ${goal.category === 'fitness' ? 'selected' : ''}>Fitness</option>
+                  <option value="career" ${goal.category === 'career' ? 'selected' : ''}>Career</option>
+                  <option value="learning" ${goal.category === 'learning' ? 'selected' : ''}>Learning</option>
+                  <option value="personal" ${goal.category === 'personal' ? 'selected' : ''}>Personal</option>
+                  <option value="other" ${goal.category === 'other' ? 'selected' : ''}>Other</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="editGoalFrequency">Frequency</label>
+                <select id="editGoalFrequency">
+                  <option value="daily" ${goal.frequency === 'daily' ? 'selected' : ''}>Daily</option>
+                  <option value="weekly" ${goal.frequency === 'weekly' ? 'selected' : ''}>Weekly</option>
+                  <option value="monthly" ${goal.frequency === 'monthly' ? 'selected' : ''}>Monthly</option>
+                  <option value="quarterly" ${goal.frequency === 'quarterly' ? 'selected' : ''}>Quarterly</option>
+                  <option value="yearly" ${goal.frequency === 'yearly' ? 'selected' : ''}>Yearly</option>
+                  <option value="custom" ${goal.frequency === 'custom' ? 'selected' : ''}>Custom</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="editTargetNature">Target Type</label>
+                <select id="editTargetNature">
+                  <option value="atleast" ${goal.targetNature === 'atleast' ? 'selected' : ''}>Minimum (At Least)</option>
+                  <option value="atmost" ${goal.targetNature === 'atmost' ? 'selected' : ''}>Maximum (At Most)</option>
+                  <option value="exact" ${goal.targetNature === 'exact' ? 'selected' : ''}>Exact Target</option>
+                </select>
+              </div>
+              
+              <div class="form-row" style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                  <label for="editStartDate">Start Date</label>
+                  <input type="date" id="editStartDate" value="${goal.startDate}">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label for="editEndDate">End Date</label>
+                  <input type="date" id="editEndDate" value="${goal.endDate}">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="editGoalNotes">Notes</label>
+                <textarea id="editGoalNotes" rows="3" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">${goal.notes || ''}</textarea>
+              </div>
+              
+              <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="closeModal('editGoalModal')" class="btn-danger">Cancel</button>
+                <button type="submit" class="btn-success">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      
+      // Set up form submission
+      document.getElementById('editGoalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateGoal(goalId);
+      });
+    }
+    
+    function toggleEditFields() {
+      const goalType = document.getElementById('editGoalType').value;
+      const amountSection = document.getElementById('editAmountSection');
+      
+      if (goalType === 'boolean') {
+        amountSection.style.display = 'none';
+      } else {
+        amountSection.style.display = 'block';
+      }
+    }
+    
+    function updateGoal(goalId) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      const goalName = document.getElementById('editGoalName').value.trim();
+      if (!goalName) {
+        showNotification('Please enter a goal name', 'error');
+        return;
+      }
+      
+      const goalType = document.getElementById('editGoalType').value;
+      const targetAmount = document.getElementById('editTargetAmount').value;
+      
+      if (goalType !== 'boolean' && !targetAmount) {
+        showNotification('Please enter a target amount', 'error');
+        return;
+      }
+      
+      // Update goal properties
+      goal.name = goalName;
+      goal.type = goalType;
+      goal.target = goalType === 'boolean' ? 'yes' : targetAmount;
+      goal.unit = document.getElementById('editUnit').value;
+      goal.category = document.getElementById('editGoalCategory').value;
+      goal.frequency = document.getElementById('editGoalFrequency').value;
+      goal.startDate = document.getElementById('editStartDate').value;
+      goal.endDate = document.getElementById('editEndDate').value;
+      goal.targetNature = document.getElementById('editTargetNature').value;
+      goal.notes = document.getElementById('editGoalNotes').value.trim();
+      goal.lastUpdated = new Date().toISOString();
+      
+      saveData();
+      updateGoalList();
+      drawChart();
+      closeModal('editGoalModal');
+      
+      showNotification('Goal updated successfully!');
+    }
+    
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.remove();
+      }
+    }
+    
+    function viewGoalDetails(goalId) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      // Create modal HTML
+      const progressRows = goal.progress.map(p => `
+        <tr>
+          <td>${p.date}</td>
+          <td>${p.value}</td>
+          <td>${p.notes || '-'}</td>
+          <td>${new Date(p.recordedAt).toLocaleString()}</td>
+          <td>
+            <button onclick="editProgressEntry('${goalId}', '${p.date}')" class="btn-info" style="padding: 5px 8px;"><i class="fas fa-edit"></i></button>
+            <button onclick="deleteProgressEntry('${goalId}', '${p.date}')" class="btn-danger" style="padding: 5px 8px;"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      
+      const progressData = calculateGoalProgress(goal);
+      
+      const modalHtml = `
+        <div id="goalDetailsModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
+          <div style="background-color: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 style="margin: 0;">${goal.name}</h3>
+              <button onclick="closeModal('goalDetailsModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+              <div>
+                <h4 style="margin-top: 0;">Goal Details</h4>
+                <p><strong>Type:</strong> ${goal.type}</p>
+                <p><strong>Target:</strong> ${goal.target} ${goal.unit}</p>
+                <p><strong>Category:</strong> ${goal.category}</p>
+                <p><strong>Frequency:</strong> ${formatFrequency(goal.frequency)}</p>
+              </div>
+              <div>
+                <h4 style="margin-top: 0;">Progress Summary</h4>
+                <p><strong>Status:</strong> <span class="${progressData.status}">${Math.round(progressData.percentage)}% ${progressData.status.replace('status-', '')}</span></p>
+                <p><strong>Achieved:</strong> ${progressData.achievedDisplay}</p>
+                <p><strong>Current Speed:</strong> ${progressData.currentSpeed || '-'}</p>
+                <p><strong>Required Speed:</strong> ${progressData.requiredSpeed || '-'}</p>
+              </div>
+            </div>
+            
+            ${goal.notes ? `<div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px;">
+              <h4 style="margin-top: 0;">Notes</h4>
+              <p>${goal.notes}</p>
+            </div>` : ''}
+            
+            <h4>Progress History</h4>
+            ${goal.progress.length > 0 ? `
+              <div style="max-height: 300px; overflow-y: auto;">
+                <table style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Value</th>
+                      <th>Notes</th>
+                      <th>Recorded At</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${progressRows}
+                  </tbody>
+                </table>
+              </div>
+            ` : '<p>No progress recorded yet.</p>'}
+            
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+              <button onclick="closeModal('goalDetailsModal')" class="btn-success">Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    function editProgressEntry(goalId, date) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      const progress = goal.progress.find(p => p.date === date);
+      if (!progress) return;
+      
+      closeModal('goalDetailsModal');
+      
+      // Switch to progress tab
+      switchTab('progress');
+      
+      // Fill the form
+      document.getElementById('progressGoal').value = goalId;
+      toggleProgressFields();
+      
+      if (goal.type === 'time') {
+        document.getElementById('progressTime').value = progress.value;
+      } else if (goal.type === 'boolean') {
+        document.getElementById('progressYesNo').value = progress.value;
+      } else {
+        document.getElementById('progressAmount').value = progress.value;
+      }
+      
+      document.getElementById('progressDate').value = progress.date;
+      document.getElementById('progressNotes').value = progress.notes || '';
+      
+      // Scroll to form
+      document.getElementById('progressForm').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function deleteProgressEntry(goalId, date) {
+      if (!confirm('Are you sure you want to delete this progress entry?')) {
+        return;
+      }
+      
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      goal.progress = goal.progress.filter(p => p.date !== date);
+      goal.lastUpdated = new Date().toISOString();
+      saveData();
+      updateGoalList();
+      drawChart();
+      
+      // Refresh the details modal
+      closeModal('goalDetailsModal');
+      viewGoalDetails(goalId);
+      
+      showNotification('Progress entry deleted');
+    }
+    
+    function deleteGoal(goalId) {
+      if (!confirm('Are you sure you want to delete this goal and all its progress data?')) {
+        return;
+      }
+      
+      goals = goals.filter(g => g.id !== goalId);
+      saveData();
+      updateGoalSelect();
+      updateGoalList();
+      drawChart();
+      
+      showNotification('Goal deleted successfully');
+    }
+    
+    // Reminder management
+    function addReminder() {
+      const title = document.getElementById('reminderTitle').value.trim();
+      if (!title) {
+        showNotification('Please enter a reminder title', 'error');
+        return;
+      }
+      
+      const date = document.getElementById('reminderDate').value;
+      const time = document.getElementById('reminderTime').value;
+      
+      if (!date || !time) {
+        showNotification('Please select both date and time', 'error');
+        return;
+      }
+      
+      const reminder = {
+        id: Date.now().toString(),
+        title: title,
+        description: document.getElementById('reminderDescription').value.trim(),
+        date: date,
+        time: time,
+        datetime: new Date(`${date}T${time}`).getTime(),
+        repeat: document.getElementById('reminderRepeat').value,
+        priority: document.getElementById('reminderPriority').value,
+        createdAt: new Date().toISOString(),
+        isCompleted: false
+      };
+      
+      reminders.push(reminder);
+      saveData();
+      updateRemindersList();
+      document.getElementById('reminderForm').reset();
+      
+      // Reset date to today
+      document.getElementById('reminderDate').value = today;
+      
+      showNotification('Reminder added successfully!');
+      
+      // Check if this reminder should trigger immediately
+      checkReminders();
+    }
+    
+    function updateRemindersList() {
+      const tbody = document.querySelector('#remindersTable tbody');
+      tbody.innerHTML = '';
+      
+      if (reminders.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="5" style="text-align: center;">No reminders yet. Add your first reminder above!</td>';
+        tbody.appendChild(row);
+        return;
+      }
+      
+      // Apply filters
+      const filteredReminders = filterRemindersList();
+      
+      if (filteredReminders.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="5" style="text-align: center;">No reminders match your filters</td>';
+        tbody.appendChild(row);
+        return;
+      }
+      
+      filteredReminders.forEach(reminder => {
+        const row = document.createElement('tr');
+        const reminderDate = new Date(reminder.datetime);
+        const now = new Date();
+        const isPast = reminder.datetime < now.getTime();
+        
+        row.innerHTML = `
+          <td>
+            <strong>${reminder.title}</strong>
+            ${reminder.description ? '<br><small>' + reminder.description + '</small>' : ''}
+            ${reminder.isCompleted ? '<span class="badge badge-success" style="margin-left: 8px;">Completed</span>' : ''}
+          </td>
+          <td>
+            ${reminderDate.toLocaleString()}
+            ${isPast && !reminder.isCompleted ? '<span class="badge badge-danger" style="margin-left: 8px;">Overdue</span>' : ''}
+          </td>
+          <td>${reminder.repeat === 'none' ? 'Does not repeat' : reminder.repeat.charAt(0).toUpperCase() + reminder.repeat.slice(1)}</td>
+          <td>
+            <span class="badge ${reminder.priority === 'high' ? 'badge-danger' : reminder.priority === 'medium' ? 'badge-warning' : 'badge-info'}">
+              ${reminder.priority.charAt(0).toUpperCase() + reminder.priority.slice(1)}
+            </span>
+          </td>
+          <td class="action-buttons">
+            <button onclick="toggleReminderCompletion('${reminder.id}')" class="${reminder.isCompleted ? 'btn-warning' : 'btn-success'}" title="${reminder.isCompleted ? 'Mark as incomplete' : 'Mark as complete'}">
+              <i class="fas ${reminder.isCompleted ? 'fa-undo' : 'fa-check'}"></i>
+            </button>
+            <button onclick="editReminder('${reminder.id}')" class="btn-info" title="Edit"><i class="fas fa-edit"></i></button>
+            <button onclick="deleteReminder('${reminder.id}')" class="btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+          </td>
+        `;
+        
+        if (reminder.isCompleted) {
+          row.style.opacity = '0.7';
+        } else if (isPast) {
+          row.style.backgroundColor = '#fff8f8';
+        }
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    function toggleReminderCompletion(reminderId) {
+      const reminder = reminders.find(r => r.id === reminderId);
+      if (!reminder) return;
+      
+      reminder.isCompleted = !reminder.isCompleted;
+      reminder.lastUpdated = new Date().toISOString();
+      saveData();
+      updateRemindersList();
+      
+      showNotification(`Reminder marked as ${reminder.isCompleted ? 'completed' : 'incomplete'}`);
+    }
+    
+    function editReminder(reminderId) {
+      const reminder = reminders.find(r => r.id === reminderId);
+      if (!reminder) return;
+      
+      // Create modal HTML
+      const modalHtml = `
+        <div id="editReminderModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
+          <div style="background-color: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3 style="margin: 0;">Edit Reminder</h3>
+              <button onclick="closeModal('editReminderModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form id="editReminderForm">
+              <div class="form-group">
+                <label for="editReminderTitle">Reminder Title</label>
+                <input type="text" id="editReminderTitle" value="${reminder.title}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="editReminderDescription">Description</label>
+                <textarea id="editReminderDescription" rows="2" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">${reminder.description || ''}</textarea>
+              </div>
+              
+              <div class="form-row" style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                  <label for="editReminderDate">Date</label>
+                  <input type="date" id="editReminderDate" value="${reminder.date}" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label for="editReminderTime">Time</label>
+                  <input type="time" id="editReminderTime" value="${reminder.time}" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="editReminderRepeat">Repeat</label>
+                <select id="editReminderRepeat">
+                  <option value="none" ${reminder.repeat === 'none' ? 'selected' : ''}>Does not repeat</option>
+                  <option value="daily" ${reminder.repeat === 'daily' ? 'selected' : ''}>Daily</option>
+                  <option value="weekly" ${reminder.repeat === 'weekly' ? 'selected' : ''}>Weekly</option>
+                  <option value="monthly" ${reminder.repeat === 'monthly' ? 'selected' : ''}>Monthly</option>
+                  <option value="yearly" ${reminder.repeat === 'yearly' ? 'selected' : ''}>Yearly</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="editReminderPriority">Priority</label>
+                <select id="editReminderPriority">
+                  <option value="low" ${reminder.priority === 'low' ? 'selected' : ''}>Low</option>
+                  <option value="medium" ${reminder.priority === 'medium' ? 'selected' : ''}>Medium</
